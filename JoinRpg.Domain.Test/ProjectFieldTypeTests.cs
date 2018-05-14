@@ -5,6 +5,9 @@ using Xunit;
 
 namespace JoinRpg.Domain.Test
 {
+    /// <summary>
+    /// This class basically tests that we don't forget to update some places when adding new project field types
+    /// </summary>
     public class ProjectFieldTypeTests
     {
         [Theory]
@@ -26,6 +29,15 @@ namespace JoinRpg.Domain.Test
         public void HasValuesListDecided(ProjectFieldType projectFieldType)
         {
             Should.NotThrow(() => projectFieldType.HasValuesList());
+        }
+
+        [Theory]
+        [MemberData(nameof(FieldTypes))]
+        public void PriceDecided(ProjectFieldType projectFieldType)
+        {
+            //This is crude test, not mean to test actual finance logic
+            var fieldWithValue = new FieldWithValue(new ProjectField() {FieldType = projectFieldType}, "0");
+            Should.NotThrow(() =>fieldWithValue.GetCurrentFee());
         }
 
         // ReSharper disable once MemberCanBePrivate.Global xUnit requirements

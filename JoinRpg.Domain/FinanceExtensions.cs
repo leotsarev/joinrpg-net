@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Linq;
 using JetBrains.Annotations;
 using JoinRpg.DataModel;
@@ -114,8 +115,12 @@ namespace JoinRpg.Domain
                 case ProjectFieldType.MultiSelect:
                     return self.GetDropdownValues().Sum(v => v.Price);
 
-                default:
+                case ProjectFieldType.String:
+                case ProjectFieldType.Text:
+                case ProjectFieldType.Header:
                     return 0;
+                default:
+                    throw new InvalidEnumArgumentException(nameof(self), (int)self.Field.FieldType, typeof(ProjectFieldType));
             }
         }
 
