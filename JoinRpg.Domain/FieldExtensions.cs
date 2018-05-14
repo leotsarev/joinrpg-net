@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -51,7 +51,13 @@ namespace JoinRpg.Domain
       return projectField.FieldType != ProjectFieldType.Header;
     }
 
-    [CanBeNull, MustUseReturnValue]
+      public static bool IsMultiLineValue(this ProjectField projectField)
+      {
+          return projectField.FieldType == ProjectFieldType.Text;
+      }
+
+
+        [CanBeNull, MustUseReturnValue]
     public static ProjectFieldDropdownValue GetBoundFieldDropdownValueOrDefault(this CharacterGroup group)
     {
       return group.Project.ProjectFields.SelectMany(pf => pf.DropdownValues)

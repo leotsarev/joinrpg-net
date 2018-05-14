@@ -1,6 +1,4 @@
-﻿@using System.Diagnostics
-@using JoinRpg.DataModel
-@using JoinRpg.Domain
+﻿@using JoinRpg.Domain
 @using JoinRpg.Web.Models.Characters
 @model CharacterListViewModel
 @{
@@ -28,23 +26,12 @@
         <th>@Html.DisplayNameFor(model => firstItem.Problems)</th>
         @foreach (var field in Model.Fields)
         {
-            switch (field.FieldType)
+            if (!field.CanHaveValue() || field.IsMultiLineValue())
             {
-                case ProjectFieldType.Text:
-                    continue;
-                case ProjectFieldType.String:
-                case ProjectFieldType.Number:
-                case ProjectFieldType.Dropdown:
-                case ProjectFieldType.Checkbox:
-                case ProjectFieldType.MultiSelect:
-            <th>@field.FieldName</th>
-                    break;
-                case ProjectFieldType.Header:
-            <th>&nbsp;</th>
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                continue;
             }
+
+            <th>@field.FieldName</th>
         }
 
     </tr>
@@ -119,29 +106,19 @@
 
         @foreach (var field in Model.Fields)
         {
-          var fieldValueViewModel = item.Fields.SingleOrDefault(f => f.Field.ProjectFieldId == field.ProjectFieldId);
-          switch (field.FieldType)
-          {
-            case ProjectFieldType.Text:
-              continue;
-            case ProjectFieldType.String:
-            case ProjectFieldType.Number:
-            case ProjectFieldType.Dropdown:
-            case ProjectFieldType.Checkbox:
-            case ProjectFieldType.MultiSelect:
-              <td>
+            if (!field.CanHaveValue() || field.IsMultiLineValue())
+            {
+                continue;
+            }
+
+            var fieldValueViewModel = item.Fields.SingleOrDefault(f => f.Field.ProjectFieldId == field.ProjectFieldId);
+
+            <td>
                 @if (fieldValueViewModel != null)
                 {
-                  @fieldValueViewModel.DisplayString
+                    @fieldValueViewModel.DisplayString
                 }
-              </td>
-                    break;
-                case ProjectFieldType.Header:
-            <td>*</td>
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            </td>
         }
     </tr>
     }
