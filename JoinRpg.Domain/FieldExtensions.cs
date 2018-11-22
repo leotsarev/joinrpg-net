@@ -48,8 +48,13 @@ namespace JoinRpg.Domain
 
     public static bool CanHaveValue(this ProjectField projectField)
     {
-      return projectField.FieldType != ProjectFieldType.Header;
+        return projectField.FieldType.CanHaveValue();
     }
+
+      public static bool CanHaveValue(this ProjectFieldType projectFieldType)
+      {
+          return projectFieldType != ProjectFieldType.Header;
+      }
 
       public static bool IsMultiLineValue(this ProjectField projectField)
       {

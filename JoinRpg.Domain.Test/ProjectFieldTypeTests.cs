@@ -33,6 +33,21 @@ namespace JoinRpg.Domain.Test
 
         [Theory]
         [MemberData(nameof(FieldTypes))]
+        public void CanHaveValueDecided(ProjectFieldType projectFieldType)
+        {
+            Should.NotThrow(() => projectFieldType.CanHaveValue());
+        }
+
+
+        [Theory]
+        [MemberData(nameof(FieldTypes))]
+        public void HasValuesListDecided(ProjectFieldType projectFieldType)
+        {
+            Should.NotThrow(() => projectFieldType.HasValuesList());
+        }
+
+        [Theory]
+        [MemberData(nameof(FieldTypes))]
         public void PriceDecided(ProjectFieldType projectFieldType)
         {
             //This is crude test, not mean to test actual finance logic
