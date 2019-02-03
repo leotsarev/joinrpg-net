@@ -1,0 +1,54 @@
+﻿@model ProjectListItemViewModel
+<div class="col-sm-6 col-md-4">
+    <div class="thumbnail">
+        <div class="caption">
+            <h4 style="text-overflow: ellipsis; white-space: nowrap; overflow-x: hidden;overflow-y:hidden" title="@Model.ProjectName">
+                <a asp-page="/game/details" asp-route-projectid="@Model.ProjectId"> Model.ProjectName</a>
+            </h4>
+            <p>
+                @if (Model.IsMaster)
+                {
+                    <a asp-page="/game/details" asp-route-projectid="@Model.ProjectId"
+                       class="btn btn-info btn-sm"
+                       role="button"
+                       title="У меня есть права мастера на этой игре">Мой проект</a>
+                }
+                @if (Model.HasMyClaims)
+                {
+                    <a asp-page="/game/myclaim" asp-route-projectid="@Model.ProjectId"
+                       class="btn btn-success btn-sm"
+                       role="button"
+                       title="Моя заявка">
+                        Моя заявка
+                    </a>
+                }
+
+                <a asp-page="/game/groups/index" asp-route-projectid="@Model.ProjectId"
+                   class="btn btn-primary btn-sm"
+                   role="button"
+                   title="Сетка ролей">
+                    Сетка ролей
+                </a>
+
+                @if (!Model.IsMaster && Model.PublishPlot)
+                {
+                    <a asp-page="/game/plot/index" asp-route-projectid="@Model.ProjectId"
+                       class="btn btn-info btn-sm"
+                       role="button">
+                        Материалы
+                    </a>
+                }
+
+                @if (!Model.IsMaster && !Model.HasMyClaims && Model.IsAcceptingClaims)
+                {
+                    <a asp-page="/game/claims/addforgroup" asp-route-projectid="@Model.ProjectId"
+                       class="btn btn-info btn-sm"
+                       role="button">
+                        Заявиться
+                    </a>
+                }
+                </p>
+        </div>
+    </div>
+</div>
+

@@ -1,3 +1,4 @@
+using System.Linq;
 using Autofac;
 using JoinRpg.Dal.Impl;
 
@@ -12,6 +13,8 @@ namespace JoinRpg.WebPortal
             builder.RegisterType<MyDbContext>();
 
             builder.RegisterType<ConfigStorage>().AsImplementedInterfaces();
+
+            builder.RegisterTypes(Managers.Registration.GetTypes().ToArray());
         }
     }
 }

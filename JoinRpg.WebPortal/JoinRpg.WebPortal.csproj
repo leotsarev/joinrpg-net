@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\JoinRpg.WebPortal.Identity\JoinRpg.WebPortal.Identity.csproj" />
+    <ProjectReference Include="..\JoinRpg.WebPortal.Managers\JoinRpg.WebPortal.Managers.csproj" />
   </ItemGroup>
 
 </Project>
