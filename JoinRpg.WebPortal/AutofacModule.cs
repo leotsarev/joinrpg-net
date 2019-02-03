@@ -10,6 +10,8 @@ namespace JoinRpg.WebPortal
         {
             base.Load(builder);
             builder.RegisterType<MyDbContext>();
+
+            builder.RegisterType<ConfigStorage>().AsImplementedInterfaces();
         }
     }
 }

@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using JoinRpg.Dal.Impl.Repositories;
@@ -16,6 +17,11 @@ namespace JoinRpg.Dal.Impl
         public MyDbContext() : base("DefaultConnection")
         {
             Database.Log = sql => { System.Diagnostics.Debug.WriteLine(sql); };
+        }
+
+        public MyDbContext(IJoinDbContextConfig config) : base(config.ConnectionString)
+        {
+             Database.Log = sql => { System.Diagnostics.Debug.WriteLine(sql); };
         }
 
         public DbSet<Project> ProjectsSet => Set<Project>();
