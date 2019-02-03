@@ -101,6 +101,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JoinRpg.WebPortal.Models", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebPortalShared", "WebPortalShared", "{B3BB8906-62C8-44A0-822C-566A144C05AE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JoinRpg.WebPortal", "JoinRpg.WebPortal\JoinRpg.WebPortal.csproj", "{2AB749F2-44A8-4793-AB6C-7914159F505B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JoinRpg.WebPortal.Identity", "JoinRpg.WebPortal.Identity\JoinRpg.WebPortal.Identity.csproj", "{33CC30EF-2F05-4C85-ACA6-C5AC041016CA}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JoinRpg.WebPortal.Managers", "JoinRpg.WebPortal.Managers\JoinRpg.WebPortal.Managers.csproj", "{A5275764-EB9F-49DA-9FEC-5BD8E67D758F}"
 EndProject
 Global
@@ -257,6 +261,14 @@ Global
 		{232A3943-E85F-47AB-8FDB-B50BD8971738}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{232A3943-E85F-47AB-8FDB-B50BD8971738}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{232A3943-E85F-47AB-8FDB-B50BD8971738}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AB749F2-44A8-4793-AB6C-7914159F505B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AB749F2-44A8-4793-AB6C-7914159F505B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AB749F2-44A8-4793-AB6C-7914159F505B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AB749F2-44A8-4793-AB6C-7914159F505B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33CC30EF-2F05-4C85-ACA6-C5AC041016CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33CC30EF-2F05-4C85-ACA6-C5AC041016CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33CC30EF-2F05-4C85-ACA6-C5AC041016CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33CC30EF-2F05-4C85-ACA6-C5AC041016CA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A5275764-EB9F-49DA-9FEC-5BD8E67D758F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A5275764-EB9F-49DA-9FEC-5BD8E67D758F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5275764-EB9F-49DA-9FEC-5BD8E67D758F}.Release|Any CPU.ActiveCfg = Release|Any CPU
