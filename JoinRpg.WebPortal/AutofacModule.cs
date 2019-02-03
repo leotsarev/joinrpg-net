@@ -1,6 +1,7 @@
 using System.Linq;
 using Autofac;
 using JoinRpg.Dal.Impl;
+using JoinRpg.WebPortal.Accessors;
 
 namespace JoinRpg.WebPortal
 {
@@ -15,6 +16,16 @@ namespace JoinRpg.WebPortal
             builder.RegisterType<ConfigStorage>().AsImplementedInterfaces();
 
             builder.RegisterTypes(Managers.Registration.GetTypes().ToArray());
+
+            builder.RegisterTypes(RepositoriesRegistraton.GetTypes().ToArray())
+                .AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
+
+            builder.RegisterTypes(Services.Impl.Services.GetTypes().ToArray())
+                .AsImplementedInterfaces().InstancePerLifetimeScope();
+
+            builder.RegisterType<CurrentUserAccessor>().AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
         }
     }
 }

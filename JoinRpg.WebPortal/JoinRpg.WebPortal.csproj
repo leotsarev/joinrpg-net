@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\JoinRpg.Services.Impl\JoinRpg.Services.Impl.csproj" />
     <ProjectReference Include="..\JoinRpg.WebPortal.Identity\JoinRpg.WebPortal.Identity.csproj" />
     <ProjectReference Include="..\JoinRpg.WebPortal.Managers\JoinRpg.WebPortal.Managers.csproj" />
   </ItemGroup>

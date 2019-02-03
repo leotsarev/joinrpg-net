@@ -1,3 +1,4 @@
+using System.Security.Principal;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
@@ -31,6 +32,7 @@ namespace JoinRpg.WebPortal
             });
 
             services.AddJoinIdentity();
+            services.AddTransient<IPrincipal>(provider => provider.GetService<IHttpContextAccessor>().HttpContext.User);
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
