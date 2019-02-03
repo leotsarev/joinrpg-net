@@ -11,10 +11,12 @@ using DbUser = JoinRpg.DataModel.User;
 
 namespace JoinRpg.WebPortal.Identity
 {
-    public class JoinUserStore : IUserStore<JoinIdentityUser>, IUserEmailStore<JoinIdentityUser>
+    internal class JoinUserStore : IUserStore<JoinIdentityUser>, IUserEmailStore<JoinIdentityUser>,
+        IUserPasswordStore<JoinIdentityUser>,
+        IUserRoleStore<JoinIdentityUser>
     {
         private readonly MyDbContext _ctx;
-        private readonly DbSet<DbUser> UserSet;
+        private DbSet<DbUser> UserSet { get; }
 
         public JoinUserStore(MyDbContext ctx)
         {
@@ -22,6 +24,7 @@ namespace JoinRpg.WebPortal.Identity
             UserSet = _ctx.Set<DbUser>();
         }
 
+        /// <inheritdoc />
         public void Dispose() => _ctx?.Dispose();
 
         /// <inheritdoc />
@@ -49,12 +52,12 @@ namespace JoinRpg.WebPortal.Identity
             CancellationToken cancellationToken) =>
             Task.FromResult(user.UserName.ToUpperInvariant());
 
-        /// <inheritdoc />
         Task IUserStore<JoinIdentityUser>.SetNormalizedUserNameAsync(JoinIdentityUser user,
             string normalizedName,
             CancellationToken cancellationToken) => Task.CompletedTask;
 
-        public async Task<IdentityResult> CreateAsync(JoinIdentityUser user, CancellationToken ct)
+        async Task<IdentityResult> IUserStore<JoinIdentityUser>.CreateAsync(JoinIdentityUser user,
+            CancellationToken ct)
         {
             if (user == null)
             {
@@ -71,6 +74,7 @@ namespace JoinRpg.WebPortal.Identity
                 {
                     RegisterDate = DateTime.UtcNow,
                 },
+                PasswordHash = user.PasswordHash,
             };
 
             if (!hasAnyUser)
@@ -92,6 +96,7 @@ namespace JoinRpg.WebPortal.Identity
             var dbUser = await LoadUser(user);
             dbUser.UserName = user.UserName;
             dbUser.Email = user.UserName;
+            dbUser.PasswordHash = user.PasswordHash;
             await _ctx.SaveChangesAsync(ct);
             return IdentityResult.Success;
         }
@@ -104,18 +109,18 @@ namespace JoinRpg.WebPortal.Identity
         public async Task<JoinIdentityUser> FindByIdAsync(string userId, CancellationToken ct)
         {
             var dbUser = await LoadUserById(userId, ct);
-            return dbUser.ToIdentityUser();
+            return dbUser?.ToIdentityUser();
         }
 
         /// <inheritdoc />
         public async Task<JoinIdentityUser> FindByNameAsync(string userName, CancellationToken ct)
         {
             var dbUser = await LoadUserByName(userName, ct);
-            return dbUser.ToIdentityUser();
+            return dbUser?.ToIdentityUser();
         }
 
 
-        public async Task SetPasswordHashAsync(JoinIdentityUser user,
+        Task IUserPasswordStore<JoinIdentityUser>.SetPasswordHashAsync(JoinIdentityUser user,
             string passwordHash,
             CancellationToken ct)
         {
@@ -124,23 +129,21 @@ namespace JoinRpg.WebPortal.Identity
                 throw new ArgumentNullException(nameof(user));
             }
 
-            var dbUser = await LoadUserByName(user.UserName, ct);
-
-            dbUser.PasswordHash = passwordHash;
-
-            await _ctx.SaveChangesAsync();
+            user.PasswordHash = passwordHash;
+            return Task.CompletedTask;
         }
 
-        public async Task<string> GetPasswordHashAsync(JoinIdentityUser user)
+        Task<string> IUserPasswordStore<JoinIdentityUser>.GetPasswordHashAsync(
+            JoinIdentityUser user,
+            CancellationToken ct)
         {
-            var dbUser = await LoadUser(user);
-            return dbUser.PasswordHash;
+            return Task.FromResult(user.PasswordHash);
         }
 
-        public async Task<bool> HasPasswordAsync(JoinIdentityUser user)
+        Task<bool> IUserPasswordStore<JoinIdentityUser>.HasPasswordAsync(JoinIdentityUser user,
+            CancellationToken ct)
         {
-            var dbUser = await LoadUser(user);
-            return dbUser.PasswordHash != null;
+            return Task.FromResult(user.PasswordHash != null);
         }
 
         public Task<DateTimeOffset> GetLockoutEndDateAsync(JoinIdentityUser user) =>
@@ -167,41 +170,45 @@ namespace JoinRpg.WebPortal.Identity
 
         public Task<bool> GetTwoFactorEnabledAsync(JoinIdentityUser user) => Task.FromResult(false);
 
-        async Task IUserEmailStore<JoinIdentityUser>.SetEmailAsync(JoinIdentityUser user,
+        Task IUserEmailStore<JoinIdentityUser>.SetEmailAsync(JoinIdentityUser user,
             string email,
             CancellationToken ct)
         {
-            var dbUser = await LoadUser(user);
-            dbUser.Email = email;
-            dbUser.UserName = email;
-            await _ctx.SaveChangesAsync(ct);
+            user.UserName = email;
+            return Task.CompletedTask;
         }
 
         Task<string> IUserEmailStore<JoinIdentityUser>.GetEmailAsync(JoinIdentityUser user,
             CancellationToken ct) => Task.FromResult(user.UserName);
 
-        async Task<bool> IUserEmailStore<JoinIdentityUser>.GetEmailConfirmedAsync(JoinIdentityUser user, CancellationToken ct)
+        Task<bool> IUserEmailStore<JoinIdentityUser>.GetEmailConfirmedAsync(JoinIdentityUser user,
+            CancellationToken ct)
         {
-            var dbUser = await LoadUser(user);
-            return dbUser.Auth.EmailConfirmed;
+            return Task.FromResult(user.EmailConfirmed);
         }
 
-        async Task IUserEmailStore<JoinIdentityUser>.SetEmailConfirmedAsync(JoinIdentityUser user, bool confirmed, CancellationToken ct)
+        Task IUserEmailStore<JoinIdentityUser>.SetEmailConfirmedAsync(JoinIdentityUser user,
+            bool confirmed,
+            CancellationToken ct)
         {
-            var dbUser = await LoadUser(user);
-            dbUser.Auth.EmailConfirmed = confirmed;
-            await _ctx.SaveChangesAsync(ct);
+            user.EmailConfirmed = confirmed;
+            return Task.CompletedTask;
         }
 
-        Task<string> IUserEmailStore<JoinIdentityUser>.GetNormalizedEmailAsync(JoinIdentityUser user,
+        Task<string> IUserEmailStore<JoinIdentityUser>.GetNormalizedEmailAsync(
+            JoinIdentityUser user,
             CancellationToken ct) => Task.FromResult(user.UserName.ToUpperInvariant());
 
-        Task IUserEmailStore<JoinIdentityUser>.SetNormalizedEmailAsync(JoinIdentityUser user, string email, CancellationToken ct)
+        Task IUserEmailStore<JoinIdentityUser>.SetNormalizedEmailAsync(JoinIdentityUser user,
+            string email,
+            CancellationToken ct)
         {
             return Task.CompletedTask;
         }
 
-        async Task<JoinIdentityUser> IUserEmailStore<JoinIdentityUser>.FindByEmailAsync(string email, CancellationToken cancellationToken)
+        async Task<JoinIdentityUser> IUserEmailStore<JoinIdentityUser>.FindByEmailAsync(
+            string email,
+            CancellationToken cancellationToken)
         {
             var user = await LoadUserByName(email, cancellationToken);
             return user.ToIdentityUser();
@@ -243,17 +250,20 @@ namespace JoinRpg.WebPortal.Identity
 
         #region Implementation of IUserRoleStore<User,in int>
 
-        public Task AddToRoleAsync(JoinIdentityUser user, string roleName) =>
+        Task IUserRoleStore<JoinIdentityUser>.AddToRoleAsync(JoinIdentityUser user,
+            string roleName,
+            CancellationToken ct) =>
             throw new NotSupportedException();
 
-        public Task RemoveFromRoleAsync(JoinIdentityUser user, string roleName) =>
+        Task IUserRoleStore<JoinIdentityUser>.RemoveFromRoleAsync(JoinIdentityUser user,
+            string roleName,
+            CancellationToken ct) =>
             throw new NotSupportedException();
 
-        public async Task<IList<string>> GetRolesAsync(JoinIdentityUser user)
+        public async Task<IList<string>> GetRolesAsync(JoinIdentityUser user, CancellationToken ct)
         {
-            var dbUser = await LoadUser(user);
             List<string> list;
-            if (dbUser.Auth?.IsAdmin ?? false)
+            if (user.IsAdmin)
             {
                 list = new List<string>() {Security.AdminRoleName};
             }
@@ -265,16 +275,23 @@ namespace JoinRpg.WebPortal.Identity
             return list;
         }
 
-        public async Task<bool> IsInRoleAsync(JoinIdentityUser user, string roleName)
+        async Task<bool> IUserRoleStore<JoinIdentityUser>.IsInRoleAsync(JoinIdentityUser user,
+            string roleName,
+            CancellationToken ct)
         {
-            var roles = await GetRolesAsync(user);
+            var roles = await GetRolesAsync(user, ct);
             return roles.Contains(roleName);
         }
+
+        /// <inheritdoc />
+        Task<IList<JoinIdentityUser>> IUserRoleStore<JoinIdentityUser>.GetUsersInRoleAsync(
+            string roleName,
+            CancellationToken cancellationToken) => throw new NotImplementedException();
 
         #endregion
 
         private async Task<User> LoadUserByName(string userName, CancellationToken ct) =>
-            await _ctx.UserSet.SingleOrDefaultAsync(user => user.Email == userName);
+            await _ctx.UserSet.SingleOrDefaultAsync(user => user.Email == userName, ct);
 
         private async Task<User> LoadUserById(string id, CancellationToken ct) =>
             await _ctx.UserSet.SingleOrDefaultAsync(user => user.UserId.ToString() == id, ct);

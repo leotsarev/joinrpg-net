@@ -11,6 +11,8 @@ namespace JoinRpg.WebPortal.Identity
                 UserName = dbUser.UserName,
                 Id = dbUser.UserId,
                 HasPassword = dbUser.PasswordHash != null,
+                PasswordHash = dbUser.PasswordHash,
+                EmailConfirmed = dbUser.Auth.EmailConfirmed,
             };
 
         public static UserExternalLogin ToUserExternalLogin(this UserLoginInfo login)
