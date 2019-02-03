@@ -1,0 +1,15 @@
+using Autofac;
+using JoinRpg.Dal.Impl;
+
+namespace JoinRpg.WebPortal
+{
+    internal class AutofacModule : Autofac.Module
+    {
+        /// <inheritdoc />
+        protected override void Load(ContainerBuilder builder)
+        {
+            base.Load(builder);
+            builder.RegisterType<MyDbContext>();
+        }
+    }
+}
