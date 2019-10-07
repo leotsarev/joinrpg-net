@@ -42,7 +42,7 @@ INSERT INTO [dbo].[ProjectFields]
            ,[MasterDescription_Contents]
            ,[ProgrammaticValue])
      SELECT 
-           '$$$Description' -- <FieldName, nvarchar(max),>
+           'Описание персонажа' -- <FieldName, nvarchar(max),>
            , 1 -- <FieldType, int,> = text
            ,1 -- <IsPublic, bit,>
            ,1 -- <CanPlayerView, bit,>
@@ -61,7 +61,7 @@ INSERT INTO [dbo].[ProjectFields]
            ,1 -- ShowOnUnApprovedClaims
            ,0 -- Price
            ,'' -- MasterDescription_Contents
-           ,'' -- ProgrammaticValue
+           ,'$$$Description' -- ProgrammaticValue
     FROM Projects P
 
 
@@ -73,10 +73,11 @@ CharacterDescription_ProjectFieldId = PF.ProjectFieldId
 FROM ProjectDetails PD
 INNER JOIN Projects P ON P.ProjectId = PD.ProjectId
 INNER JOIN ProjectFields PF ON PF.ProjectId = P.ProjectId
-            WHERE PF.FieldName LIKE '$$$Description'
+            WHERE PF.ProgrammaticValue LIKE '$$$Description'
+");
 
-
-UPDATE Characters
+            /*
+             * UPDATE Characters
 SET
  JsonData = JSON_MODIFY(ISNULL(JsonData, '{}'), '$.""' + CAST(PF.ProjectFieldId  AS VARCHAR) + '""', C.Description_Contents)
 
@@ -88,8 +89,7 @@ SET
 UPDATE ProjectFields
 SET FieldName = 'Описание персонажа'
 WHERE FieldName LIKE '$$$Description'
-
-");
+             */
             DropColumn("dbo.Projects", "ProjectFieldsOrdering");
             DropColumn("dbo.ProjectDetails", "AllrpgId");
             DropColumn("dbo.ProjectDetails", "GenerateCharacterNamesFromPlayer");

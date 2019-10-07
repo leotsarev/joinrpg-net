@@ -24,6 +24,12 @@ namespace JoinRpg.Services.Impl
                 // It helps battle akward situations where names was re-bound to some new field
                 // and empty values start overwriting names
             }
+
+            if (field == field.Project.Details.CharacterDescription && character != null)
+            {
+                return character.Description.Contents;
+            }
+
             return character != null
               ? PluginFactory
                 .GenerateDefaultCharacterFieldValue(character, field)
