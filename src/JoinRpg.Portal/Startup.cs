@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text;
 using Autofac;
 using Joinrpg.Web.Identity;
 using JoinRpg.BlobStorage;
@@ -22,6 +23,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 
 namespace JoinRpg.Portal
 {
@@ -141,7 +143,7 @@ namespace JoinRpg.Portal
                   options.SupportedCultures = new CultureInfo[] { new CultureInfo("ru-RU") };
               });
 
-            if (env.IsDevelopment())
+            if (env.IsDevelopment() || true)
             {
                 _ = app.UseDeveloperExceptionPage();
             }
@@ -176,6 +178,16 @@ namespace JoinRpg.Portal
             }
 
             _ = app.UseStaticFiles();
+
+            app.Use(async (context, n) =>
+            {
+                var debugData = $@"
+QueryString: {context.Request.QueryString}
+Scheme: {context.Request.Scheme}
+Host: {context.Request.Host}";
+
+                throw new System.Exception(debugData);
+            });
 
             _ = app.UseRouting();
 
