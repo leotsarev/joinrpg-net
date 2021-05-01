@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using System.Text;
 using Autofac;
@@ -14,6 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
@@ -106,12 +108,6 @@ namespace JoinRpg.Portal
                 .AddAuthentication()
                 .ConfigureJoinExternalLogins(Configuration.GetSection("Authentication"));
 
-            services.Configure<ForwardedHeadersOptions>(options =>
-            {
-                options.ForwardedHeaders =
-                    ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-            });
-
             _ = services.AddSwaggerGen(Swagger.ConfigureSwagger);
             _ = services.AddApplicationInsightsTelemetry();
 
@@ -135,6 +131,36 @@ namespace JoinRpg.Portal
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            _ = app.UseForwardedHeaders();
+
+            app.Run(async (context) =>
+            {
+                context.Response.ContentType = "text/plain";
+
+                // Request method, scheme, and path
+                await context.Response.WriteAsync(
+                    $"Request Method: {context.Request.Method}{Environment.NewLine}");
+                await context.Response.WriteAsync(
+                    $"Request Scheme: {context.Request.Scheme}{Environment.NewLine}");
+                await context.Response.WriteAsync(
+                    $"Request Path: {context.Request.Path}{Environment.NewLine}");
+
+                // Headers
+                await context.Response.WriteAsync($"Request Headers:{Environment.NewLine}");
+
+                foreach (var header in context.Request.Headers)
+                {
+                    await context.Response.WriteAsync($"{header.Key}: " +
+                        $"{header.Value}{Environment.NewLine}");
+                }
+
+                await context.Response.WriteAsync(Environment.NewLine);
+
+                // Connection: RemoteIp
+                await context.Response.WriteAsync(
+                    $"Request RemoteIp: {context.Connection.RemoteIpAddress}");
+            });
+
             _ = app.UseRequestLocalization(options =>
               {
                   options.DefaultRequestCulture = new RequestCulture("ru-RU");
@@ -166,7 +192,7 @@ namespace JoinRpg.Portal
                   }
               });
 
-            _ = app.UseForwardedHeaders();
+
 
             _ = app
                 .UseSwagger(Swagger.Configure)
