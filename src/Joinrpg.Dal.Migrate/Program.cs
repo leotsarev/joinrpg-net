@@ -1,3 +1,5 @@
+using JoinRpg.Dal.Impl;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -14,6 +16,14 @@ internal class Program
         Host.CreateDefaultBuilder(args)
             .ConfigureServices((hostContext, services) =>
             {
-                _ = services.AddHostedService<MigrateHostService>();
+                services.AddSingleton<IJoinDbContextConfiguration>(
+                    new DbContextConfiguration
+                    {
+                        ConnectionString = hostContext.Configuration.GetConnectionString(DbConsts.DefaultConnection),
+                        DetailedErrors = true,
+                        SensitiveLogging = true,
+                    });
+                services.AddDbContext<MyDbContext>();
+                services.AddHostedService<MigrateHostService>();
             });
 }

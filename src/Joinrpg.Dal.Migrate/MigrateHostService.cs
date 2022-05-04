@@ -1,38 +1,71 @@
-using System.Data.Entity.Migrations;
-using System.Data.Entity.Migrations.Infrastructure;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
+using JoinRpg.Dal.Impl;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Joinrpg.Dal.Migrate;
 
-internal class MigrateHostService : OneTimeOperationHostedServiceBase
+internal class MigrateHostService : Microsoft.Extensions.Hosting.BackgroundService
 {
-    private readonly IConfiguration configuration;
+    private readonly ILogger _logger;
+    private readonly IServiceProvider _services;
 
-    public MigrateHostService(IHostApplicationLifetime applicationLifetime, ILogger<MigrateHostService> logger, IConfiguration configuration)
-        : base(applicationLifetime, logger) => this.configuration = configuration;
-
-    internal override void DoWork()
+    public MigrateHostService(
+        IServiceProvider services,
+        ILogger<MigrateHostService> logger)
     {
-        logger.LogInformation("Create migration");
+        _logger = logger;
+        _services = services;
+    }
 
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
+    private async Task MigrateAsync(DbContext dbContext, CancellationToken stoppingToken)
+    {
+        var lastAppliedMigration = (await dbContext.Database.GetAppliedMigrationsAsync(stoppingToken)).LastOrDefault();
+        if (!string.IsNullOrEmpty(lastAppliedMigration))
+        {
+            _logger.LogInformation("Last applied migration: {LastAppliedMigration}", lastAppliedMigration);
+        }
 
-        //TODO mask connection string from logs;
-        //logger.LogInformation("Discovered connection string {connectionString}", connectionString);
+        if (stoppingToken.IsCancellationRequested)
+        {
+            return;
+        }
 
-        var migrator = new MigratorLoggingDecorator(new DbMigrator(new JoinMigrationsConfig(connectionString)), new MigrationsLoggerILoggerAdapter(logger));
-        logger.LogInformation("Migrator created");
+        var pendingMigrations = string.Join("; ", await dbContext.Database.GetPendingMigrationsAsync(stoppingToken));
+        foreach (var pm in pendingMigrations)
+        {
+            _logger.LogInformation("Pending migration: {PendingMigration}", pm);
+        }
 
-        logger.LogInformation("Start migration");
+        if (stoppingToken.IsCancellationRequested)
+        {
+            return;
+        }
 
-        logger.LogInformation("Last local migration {lastLocal}", migrator.GetLocalMigrations().OrderBy(x => x).LastOrDefault());
-        logger.LogInformation("Last DB migration {lastDb}", migrator.GetDatabaseMigrations().OrderBy(x => x).LastOrDefault());
+        _logger.LogInformation("Applying migrations...");
+        await dbContext.Database.MigrateAsync(stoppingToken);
+        _logger.LogInformation("Database has been successfully migrated");
+    }
 
-        var pending = migrator.GetPendingMigrations();
-        logger.LogInformation("Pending migrations {pending}", string.Join("\n", pending));
-        migrator.Update();
-        logger.LogInformation("Migration completed");
+    /// <inheritdoc />
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        _logger.LogInformation("Starting migrator...");
+        await using var scope = _services.CreateAsyncScope();
+        try
+        {
+            await MigrateAsync(
+                scope.ServiceProvider.GetRequiredService<MyDbContext>(),
+                stoppingToken);
+
+            if (stoppingToken.IsCancellationRequested)
+            {
+                _logger.LogInformation("Terminating by cancellation token");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error executing migrator");
+        }
     }
 }
