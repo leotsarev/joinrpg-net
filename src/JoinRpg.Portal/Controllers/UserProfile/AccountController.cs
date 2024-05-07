@@ -90,7 +90,7 @@ public class AccountController : Common.ControllerBase
         }
 
         // Require the user to have a confirmed email before they can log on.
-        var user = await UserManager.FindByNameAsync(model.Email);
+        var user = await UserManager.FindByNameAsync(model.Email.Trim());
 
         if (user != null)
         {
@@ -104,7 +104,7 @@ public class AccountController : Common.ControllerBase
         // This doesn't count login failures towards account lockout
         // To enable password failures to trigger account lockout, change to shouldLockout: true
         var result =
-            await SignInManager.PasswordSignInAsync(model.Email,
+            await SignInManager.PasswordSignInAsync(model.Email.Trim(),
                 model.Password,
                 isPersistent: true,
                 lockoutOnFailure: false);
@@ -155,6 +155,8 @@ public class AccountController : Common.ControllerBase
             model.RecaptchaPublicKey = recaptchaOptions.Value.PublicKey;
             return View(model);
         }
+
+        model.Email = model.Email.Trim();
 
         //this can be null i.e. under proxy or from localhost.
         //TODO IISIntegration, etc

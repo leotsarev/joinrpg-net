@@ -26,8 +26,12 @@ public class UsersController : JoinRpg.Portal.Controllers.Common.ControllerBase
     public async Task<ActionResult> ChangeEmail(ChangeEmailModel model)
     {
         var user = await UserManager.FindByIdAsync(model.UserId.ToString());
-        var token = await UserManager.GenerateChangeEmailTokenAsync(user, model.NewEmail);
-        var result = await UserManager.ChangeEmailAsync(user, model.NewEmail, token);
+        if (user is null)
+        {
+            return NotFound();
+        }
+        var token = await UserManager.GenerateChangeEmailTokenAsync(user, model.NewEmail.Trim());
+        var result = await UserManager.ChangeEmailAsync(user, model.NewEmail.Trim(), token);
         if (!result.Succeeded)
         {
             return new ContentResult { Content = $"Ошибка!, {result}" };
