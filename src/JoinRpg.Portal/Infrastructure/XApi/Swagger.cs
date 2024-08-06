@@ -36,26 +36,18 @@ internal static class Swagger
             Title = "My API",
             Version = "v1"
         });
-        c.IncludeXmlCommentsForAssembly(Assembly.GetExecutingAssembly());
-        c.IncludeXmlCommentsForAssembly(typeof(XGameApi.Contract.AuthenticationResponse).Assembly);
+        c.IncludeXmlComments(Assembly.GetExecutingAssembly());
+        c.IncludeXmlComments(typeof(XGameApi.Contract.AuthenticationResponse).Assembly);
 
         c.DocumentFilter<SwaggerXGameApiFilter>();
     }
 
-    private static void IncludeXmlCommentsForAssembly(this SwaggerGenOptions c, Assembly assembly)
-        => c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{assembly.GetName().Name}.xml"));
     internal static void Configure(SwaggerOptions options) { }
 
     internal static void ConfigureUI(SwaggerUIOptions c)
     {
         c.SwaggerEndpoint("v1/swagger.json", "My API V1");
         c.ConfigObject.DeepLinking = true;
-    }
-
-    internal static Task RedirectToSwagger(HttpContext ctx)
-    {
-        ctx.Response.Redirect("swagger/");
-        return Task.CompletedTask;
     }
 
     private class SwaggerXGameApiFilter : IDocumentFilter
