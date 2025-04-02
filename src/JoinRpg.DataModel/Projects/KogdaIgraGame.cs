@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using JoinRpg.Helpers;
 
 namespace JoinRpg.DataModel.Projects;
 public class KogdaIgraGame
@@ -35,6 +34,7 @@ public class KogdaIgraGame
 
     public virtual HashSet<Project> Projects { get; set; } = [];
 
-    public override string ToString() => $"KogdaIgraGame(Id={KogdaIgraGameId}, UpdateRequestedAt={UpdateRequestedAt}, LastUpdatedAt={LastUpdatedAt}, Name={Name}, JsonGameData=({JsonGameData}, Projects={Projects.Select(p => p.ProjectId.ToString()).JoinStrings(",")})";
+    // Если добавлять сюда Projects, то может быть лишний бесмысленный LazyLoad
+    public override string ToString() => $"KogdaIgraGame(Id={KogdaIgraGameId}, UpdateRequestedAt={UpdateRequestedAt}, LastUpdatedAt={LastUpdatedAt}, Name={Name}, JsonGameData=({JsonGameData})})";
 
 }
