@@ -8,7 +8,12 @@ namespace JoinRpg.Common.WebInfrastructure;
 
 public static class DbContextRegisterHelper
 {
-    public static bool AddJoinEfCoreDbContext<TContext>(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment, string connectionStringName)
+    public static bool AddJoinEfCoreDbContext<TContext>(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        IHostEnvironment environment,
+        string connectionStringName,
+        Action<DbContextOptionsBuilder>? optionsAction = null)
         where TContext : DbContext
     {
         var connectionString = configuration.GetConnectionString(connectionStringName);
@@ -18,20 +23,20 @@ public static class DbContextRegisterHelper
             return false;
         }
 
-        services.AddDbContext<TContext>(
+        _ = services.AddDbContext<TContext>(
         options =>
         {
-            options.UseNpgsql(connectionString);
-            options.EnableSensitiveDataLogging(environment.IsDevelopment());
-            options.EnableDetailedErrors(environment.IsDevelopment());
-            options.UseExceptionProcessor();
-            options
+            _ = options
+                .UseNpgsql(connectionString)
+                .EnableSensitiveDataLogging(environment.IsDevelopment())
+                .EnableDetailedErrors(environment.IsDevelopment())
+                .UseExceptionProcessor()
                 .ConfigureWarnings(
                     b => b.Log(
                         (RelationalEventId.CommandExecuted, LogLevel.Debug)));
-        });
+            optionsAction?.Invoke(options);
+        })
 
-        services
             .AddHealthChecks()
             .AddNpgSql(
                 connectionString,
