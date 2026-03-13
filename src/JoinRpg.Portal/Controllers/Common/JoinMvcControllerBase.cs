@@ -67,6 +67,9 @@ public abstract class JoinMvcControllerBase : Controller
             case JoinFieldScheduleShouldBeUniqueException _:
                 ModelState.AddModelError("", "Невозможно добавить второе поле с настройками расписания");
                 return;
+            case NoAccessToProjectException noAccessToProjectException:
+                ModelState.AddModelError("", $"Нет доступа к проекту, требуется доступ {noAccessToProjectException.Permission}");
+                break;
             default:
 
                 logger.LogError(exception, "Исключение при обработке запроса");
