@@ -28,6 +28,7 @@ public class FinancesController(
     ICurrentUserAccessor currentUserAccessor,
     IProjectMetadataRepository projectMetadataRepository,
     IClaimsRepository claimsRepository,
+    IExpenseRepository expenseRepository,
     UserProfileDetailsBuilder cardBuilder
         ) : JoinControllerGameBase
 {
@@ -89,16 +90,19 @@ public class FinancesController(
 
         var operations = project.FinanceOperations.ToArray();
 
+        var expenses = await expenseRepository.GetExpenses(projectId);
+
         var payments = projectInfo.ProjectFinanceSettings.PaymentTypes
             .Select(pt => new PaymentTypeSummaryViewModel(pt, operations))
             .Where(m => m.Total != 0).OrderByDescending(m => m.Total).ToArray();
 
-        var masterIds = MasterBalanceBuilder.GetMasterIds(operations, transfers, projectInfo);
+        var masterIds = MasterBalanceBuilder.GetMasterIds(operations, transfers, expenses, projectInfo);
         var masters = await UserRepository.GetRequiredUserInfos(masterIds);
 
         var viewModel = new MoneyInfoTotalViewModel(projectInfo,
             transfers,
             operations,
+            expenses,
             payments,
             currentUserAccessor,
             masters);
@@ -126,11 +130,13 @@ public class FinancesController(
 
         var masterTransfers = await financeReportRepository.GetAllMoneyTransfers(projectId.Value);
 
-        var masterIds = MasterBalanceBuilder.GetMasterIds(masterOperations, masterTransfers, projectInfo);
+        var expenses = await expenseRepository.GetExpenses(projectId);
+
+        var masterIds = MasterBalanceBuilder.GetMasterIds(masterOperations, masterTransfers, expenses, projectInfo);
         var masters = await UserRepository.GetRequiredUserInfos(masterIds);
 
         var summary =
-            MasterBalanceBuilder.ToMasterBalanceViewModels(masters, masterOperations, masterTransfers, projectInfo);
+            MasterBalanceBuilder.ToMasterBalanceViewModels(masters, masterOperations, masterTransfers, expenses, projectInfo);
 
         var generator = exportDataService.GetGenerator(ExportType.Csv, summary,
     new MoneySummaryByMasterExporter(uriService));
