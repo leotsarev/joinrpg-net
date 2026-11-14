@@ -1,1 +1,2 @@
 #nullable enable
+static JoinRpg.Common.WebInfrastructure.EfCoreMigration.EfCoreMigrationExtensions.RegisterMigrator<TContext>(this Microsoft.AspNetCore.Builder.WebApplicationBuilder! builder, string! connectionStringName, System.Action<Microsoft.EntityFrameworkCore.DbContextOptionsBuilder!>? optionsBuilder = null) -> void

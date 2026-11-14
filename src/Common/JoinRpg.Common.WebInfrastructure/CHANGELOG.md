@@ -5,6 +5,7 @@
 ## Не выпущено
 
 ### Добавлено
+- `EfCoreMigrationExtensions.RegisterMigrator<TContext>()`: перегрузка для `WebApplicationBuilder` — регистрация мигратора БД одной строкой, конфигурация и окружение берутся из билдера. ([#6224](https://github.com/joinrpg/joinrpg-net/pull/6224))
 - При логине claims из `connect/user_info` мёржатся в principal (best effort): ник, аватар и другие данные IdPortal доступны в `IJoinUserLoginHandler.HandleLoginAsync` без сервисных вызовов.
 
 ### Изменено
